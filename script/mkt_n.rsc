@@ -33,6 +33,29 @@
     :set alarm 1
   }
 
+
+
+  :if (($hstatus ="down") &&  ($netwatchlist->$hostcount="up")) do={
+    :local chonoff
+    :local ncomment [/tool netwatch get value-name=comment number=$h]
+    :if ($ncomment="ap1") do={
+         :set chonoff "1"
+    } else={
+      :if ($ncomment="ap2") do={ :set chonoff "2"}
+    }
+    :do {
+       /tool fetch url="http://192.168.12.3/?reboot$chonoff=on" mode=http keep-result=no
+       :put "internet on/off $ncomment reboot"
+       :log info "internet on/off $ncomment reboot"
+       :delay 1
+    } on-error={ 
+       :log error "script error internet on/off can not fetch !!!"
+    }
+  }
+
+
+
+
 :set hostcount ($hostcount + 1)
 }
 :set uri ("$uri&hostcount=$hostcount")
